@@ -1,0 +1,9 @@
+http://tomcat.apache.org/
+archive-6.0.53-bin-64.zip+9.0
+EE mode
+servers
+left click
+new-server
+browse
+servers start
+(port error)packge - server.xml-(design>source) - 63,20change 
