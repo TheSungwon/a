@@ -491,3 +491,265 @@ insert into emp01(empno, ename, job, mgr, hiredate, sal, comm, deptno) values(74
 insert into emp01(empno, ename, job, mgr, hiredate, sal, comm, deptno) values(7839,'king','president',null,null,5000,null,null);
 select * from emp01;
 ----------------------------------------------
+----무결성제약 조건***********
+-- not null 제약조건 null을 허용하지않는다.
+drop table emp01;
+create table emp01( empno number(4) not null,
+                    ename varchar2(10) not null,
+                    job varchar2(9), 
+                    deptno number(4) );
+-- insert into emp01 values(null, null, 'salesman', 30); not null조건으로 null 불가
+
+--unique 제약조건 중복된 값을 허용하지 않는다. 항상 유일한 값. (사원번호가 같으면 안됨.)
+create table emp01( empno number(4) unique, --사원번호
+                    ename varchar2(10) not null,
+                    job varchar2(9), 
+                    deptno number(4) );
+
+insert into emp01(7499,'allen','saleman',30); --한번밖에 못 함. unique!
+
+insert into emp01(null,'jones','manager',20);
+insert into emp01(null,'jones','salesman',10); --unique는 null은 허용.
+--unique와 null 관계. unique에서 null값도 입력되지않게하려면 empno number(4) unique not null 두 가지를 기술
+
+--데이터 딕셔너리*데이터베이스 자원을 관리하기위한 정보를 저장하는 시스템
+--데이터딕셔너리 원 테이블은 직접조회하기 불가능해서 데이터딕셔너리 뷰를 제공한다.
+--dba_xxxx, all_xxxx, user_xxxx
+desc user_tables; --생성한 테이블의 정보알기
+
+show user;
+select table_name from user_tables order by table_name desc; --오라클서버에 접속한 사용자 계정과 테이블의이름조회
+
+--제약조건 확인하기**제약조건의 에러메세지의 원인 알기위해 user_constaints 데이터딕셔너리가있다.
+--제약조건명 constraint_name, 제약조건유형 constraint_type, 제약조건이속한테이블 table_name
+
+column constraint_type format a18; --칼럼의 크기를 늘려주기 위한 명령어
+select constraint_name, constraint_type, table_name from user_constraints;
+
+select * from user_cons_columns where table_name='emp02'; --?
+
+--primay key 제약조건 ******
+--unique제약조건과 not null제약조건을 모두 갖고있는 primary key
+create table emp04( empno number(4) primary key,
+                    ename varchar2(10) not null,
+                    job varchar2(9), 
+                    deptno number(4) );
+insert into emp04 values(7499,'allen','slaesman',30); --동일한 사원번호 입력하면 무결성제약조건 에러
+insert into emp04 values(null,'allen','slaesman',30); --null값도 에러
+
+select constraint_name, constraint_type, table_name from user_constraints where table_name='emp04'; --??
+
+--참조 무결성을 위한 foreign key 제약조건
+--참조 무결성은 두 테이블 사이의 주종관계 설정
+select table_name from user_tables;
+select * from emp04;
+--참조하는 테이블이 자식테이블이 됨
+alter table dept
+add primary key(deptno); --dept테이블에 deptno칼럼에게 primary key제약조건 주기. 없으면 외래키불가
+
+create table emp05( empno number(4) primary key, ename varchar2(10) not null,
+job varchar2(9), deptno number(4) references dept(deptno) );
+
+insert into emp05 values(7499,'allen','salesman',30);
+select * from emp05;
+--insert into emp05 values(7499,'allen','salesman',50); --50부서는 없기때문에 생성불가
+
+--check 제약조건. ** 입력되는 값을 체크. 이외의 값이 오면 오류
+create table emp06( empno number(4) primary key, ename varchar2(10) not null,
+gender varchar2(1) check(gender in('m','f')) );
+insert into emp06 values(7566,'jones','m'); --m,f 외에는 오류
+
+--제약조건명 지정하기 * 사용자가 의미있게 제약 조건명을 명시하려 제약조건명으로도 알수있게
+--테이블명_칼럼명_제약조건유형_제약조건 emp05_empno_pk_primary key
+drop table emp05;
+create table emp05( empno number(4) constraint emp05_empno_pk primary key,
+                    ename varchar2(10) constraint emp05_ename_nn not null,
+                    job varchar2(9) constraint emp05_job_uk unique,
+                    deptno number(4)constraint emp05_deptno_fk reference dept(deptno) );
+                    
+                 --왜안대
+--테이블레벨방식으로 제약조건 지정하기
+--복합키로 기본키 지정 ..칼럼레벨형식불가. 테이블레벨방식으로만
+--alter table로 제약조건 추가. 테이블레벨방식으로
+
+drop table emp04;
+create table emp04( empno number(4) primary key,
+                    ename varchar2(10) not null,
+                    job varchar2(9) unique, 
+                    deptno number(4) references dept(deptno) ); --칼럼레벨로 지정
+                    
+drop table emp04;
+create table emp04( empno number(4) ,
+                    ename varchar2(10) not null,
+                    job varchar2(9), 
+                    deptno number(4),
+                    
+                    primary key(empno, job),
+                    foreign key(deptno) references dept(deptno) ); --테이블레벨로 지정 +primary에 2개이상 가능
+                    
+drop table emp03;
+create table emp03( empno number(4),
+                    ename varchar2(10) constraint emp03_ename_nn not null,
+                    job varchar2(9), 
+                    deptno number(4),
+                    
+                   constraint emp03_empno_pk primary key(empno) ); --칼럼명을 명시적으로 지정 .constraint키워드
+                   
+-- 제약조건변경하기
+--테이블생성이 끝난 후 제약조건 추가 alter table
+create table emp01( empno number(4),
+                    ename varchar2(10),
+                    job varchar2(9), 
+                    deptno number(4) );
+alter table emp01 add primary key(empno); --alter table을 이용해 제약조건추가
+alter table emp01 add constraint emp01_deptno_fk foreign key(deptno) references dept(deptno);
+
+select * from user_constraints where table_name='EMP01'; --테이블이름 대문자로
+
+--제약조건 제거하기 drop costraint를 이용
+
+--alter table drop constraint emp06_emp_pk; --제약조건제거
+
+--제약조건의 비활성활 cascade 
+--disable constraint비활성화, enable constraint 비활성화해제
+
+--delete from dept01 where deptno=10; 자식테이블emp01이 dept01을 참조하고 있어 지울수없다.
+---제거하려면 emp01 10번부서 데이터를 지우고나서 칼럼 지우기 or emp01 외래키를 삭제 하고 칼럼삭제
+----emp01테이블의 외래키를 비활성화한다.
+--alter table disable constraint emp01_deptno01_deptno_fk;
+--alter table enable constraint emp01_deptno_fk;
+
+--cascade 옵션. forign key설정되어있을때 부모테이블이 비활성화하면 자식테이블도 비활성화해준다
+---alter table dept01 disable primary key; -제약조건으로 모르더라도 primary key로 비활성화
+
+--alter table dept01 disable primary key cascade; --부모테이블 비활성화
+--alter table dept01 drop primary key cascade; --cascade옵션을 지정하여 기본키제약조건삭제 하면 참조하는 외래키도 삭제
+
+--*******조인.. 한 개 이상의 테이블에서 원하는 결과를 얻기위한
+--where절 조건이 from절에 명시한 여러 테이블을 묶는 join조건. 테이블수가 n개면 join조건은 n-1개다.
+
+--1)cross join - 2개이상 테이블 조인될때 where절에 의해 공통 칼럼에 의한 결합이 안됨. 모든 데이터가 결과
+select * from emp, dept; --아무 의미없는 테이블조합
+
+--join규칙. primary key와 foreign key 열을 다른 테이블의 행과 연결
+--          연결 key사용으로 테이블과 테이블 결합
+--          where절에서 조인조건을 사용. (조인조건 개수 = 연결 테이블수 -1)?
+--          명확성을 위해 칼럼 이름 앞에 테이블명 또는 별칭을 붙인다.
+
+--2)equi join. 가장많이 사용. 두 테이블에서 공통적으로 존재하는 칼럼값이 일치되는 행을 연결
+
+--emp, dept테이블의 공통 칼럼 deptno값이 일치되는 조건을 where절에 사용. 두 테이블을 조인하려면
+--일치되는 공통칼럼 사용. 칼럼명이 같으면 혼동하므로 칼럼명 앞에 테이블명.칼럼
+
+
+select ename, dname from emp, dept
+where emp.deptno = emp.deptno;
+
+--별칭
+select e.ename, e.deptno, d.dname, d.deptno from emp e, dept d
+where e.deptno = d.deptno;
+
+select e.ename, e.deptno, d.dname, d.deptno from emp e, dept d
+where e.deptno = d.deptno and e.ename='SCOTT';
+
+--3) non-equi join . 테이블 사이의 칼럼 값이 직접적으로 불일치 시 =을 제외한 연산자.
+select * from salgrade;
+select e.ename, e.sal, s.grade from emp e, salgrade s
+where e.sal between s.losal and s.hisal; --or where e.sal >= s.losal and e.sal <= s.hisal
+-- 급여등급 5개로 나눈 salgrade테이블에서 각 사원의 급여등급 지정. emp와 salgrade테이블 조인
+
+--4)outer join. 행이 조인 조건에 만족하지않을경우 나타나지 않으므로 outer join을 사용
+select e.ename, d.deptno, d.dname from emp e, dept d
+where e.deptno(+) = d.deptno --40번 부서가 안 나옴 (+) outer join
+order by d.deptno;
+
+--5)self join 자기 자신과 조인. from절 다음 동일한 테이블명 where절에 다른 테이블인 것처럼 별칭
+select ename, mgr from emp; --사수 출력
+
+select w.ename, m.ename from emp w, emp m
+where w.mgr = m.empno;
+
+select w.ename||'의매니저는'||m.ename||'이다.' as "그 사원의 매니저"
+from emp w, emp m 
+where w.mgr = m.empno;
+
+--6)ANSI join --데이터베이스 표준언어
+
+--1 ANSI cross join
+select * from emp cross join dept; -- ,대신 cross join
+
+--2 ANSI inner join
+select ename, dname from emp inner join dept
+on emp.deptno = dept.deptno;
+
+--3 using
+select emp.ename, dept.dname from emp inner join dept using(deptno);
+
+--4natural join . 조건절 생략. 자동으로 공통 칼럼을 조사
+select ename, dname from emp natural join dept;
+
+--5 ANSI outer join (+)대신 left, right, full
+select e.ename, d.deptno, d.dname from emp e right outer join dept d
+on e.deptno = d.deptno;
+
+--******서브쿼리 . 
+select deptno from emp where ename='SCOTT'; --부서번호 20 알아냄
+
+--서브쿼리 변경
+select dname from dept where deptno = (select deptno from emp where ename='SCOTT'); --20번 dname은?
+
+--2) 단일행 서브쿼리 .내부 select문장으로부터 오직 하나의 로우만을 반환. 비교연산자 사용
+select * from emp where deptno = (select deptno from emp where ename='SMITH'); --smith와 같은부서에서 근무하는 사원
+
+select ename, sal from emp where sal > (select avg(sal) from emp); --평균급여보다 많이 받는 사원
+
+--3) 다중행 서브쿼리 . 서브쿼리에서 반환되는 결과가 하나 이상의 행일 때 in any som all exist
+--결과가 2개이상 구해지는 쿼리문을 서브쿼리로 기술할 경우 다중행 연산자 사용
+
+--in연산자 . 하나라도 일치하면 참
+select ename, sal, deptno from emp where deptno 
+in (select distinct deptno from emp where sal >= 3000); --3000이상 받는 부서 10,20 의 정보
+
+--all연산자  서브쿼리검색 결과와 모든 값이 일치
+select ename, sal from emp where sal > all(select sal from emp where deptno=30); --서브쿼리 모두 보다 많이 받는
+
+--any 연산자. 하나 이상만 일치하면 참. 최솟값보다 크면 참이된다
+select ename, sal from emp where sal > any(select sal from emp where deptno=30);
+
+--4) 서브쿼리로 테이블 작성하기
+--1 복사하기
+create table emp01 as
+select * from emp;
+
+--모든 칼럼이 아닌 특정 칼럼만 선택 복사 하려면 칼럼의 이름
+create table emp02 as
+select empno, ename from emp;
+
+--2 테이블 구조만 복사하기
+create table emp03 as
+select * from emp where 1=0;
+
+--5) 서브쿼리를 이용한 데이터 추가
+--서브쿼리를 사용하여 insert문장 작성, values절은 사용안함. 단 서브쿼리값 개수와 insert할 테이블 열수가 일치 해야함
+create table dept01 as
+select *from dept where 1=0;
+
+insert into dept01 select * from dept;
+
+--6) 서브쿼리를 이용한 데이터 수정
+update dept01
+set loc = (select loc from dept01 where deptno=40); --10번부서를 40번 부서의 지역명으로 변경
+
+--7) 서브 쿼리를 이용한 두 개 이상의 칼럼값 변경
+update dept01
+set (dname,loc) = (select dname,loc from dept01 where deptno=30)
+where deptno=20; --20번부서의 부서명과 지역명을 30번 부서의 부서명과 지역명으로 수정
+--또는
+update dept01
+set dname = (select dname from dept01 where deptno =30),
+    loc = (select loc from dept01 where deptno=30)
+where deptno=20;
+
+--8) 서브쿼리를 이용한 데이터삭제
+delete from emp01
+where deptno = (select deptno from dept where dname='SLAES'); --slaes의 부서번호와같은 emp01의부서번호 지우기
