@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+<!--id속성으로 a를 가지는 태그의 후손위치에 있는 h1태그를 red-->
+<style>
+#a h1 { color : red;}
+#b h1 { color : orange;}
+</style>
+</head>
+<body>
+
+	<div id="a">
+		<h1 class="title">dddddddd</h1>
+		<div id="nav">
+			<h1>ccccccccc</h1>
+		</div>
+	</div>
+	
+	<div id="b">
+		<h1 class="title">eeeeeeeeee</h1>
+		<p>gggggggggg</p> <!-- h1이 아니므로 적용X -->
+	</div>
+</body>
+</html>
