@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>WebPjt</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <description></description>
+    <display-name>NowSv</display-name>
+    <servlet-name>NowSv</servlet-name>
+    <servlet-class>Servlet1126.NowSv</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>NowSv</servlet-name>
+    <url-pattern>/NowSv</url-pattern>
+  </servlet-mapping>
+  
+  
+  
+  <context-param>
+  	<description>로깅여부</description>
+  	<param-name>logEnabled</param-name>
+  	<param-value>true</param-value>
+  </context-param>
+  
+ <context-param>
+  	<description>디버깅레벨</description>
+  	<param-name>debugLevel</param-name>
+  	<param-value>5</param-value>
+  </context-param>
+  
+  
+<!--   <error-page>
+  	<error-code>404</error-code>
+  	<location>/jsp1202/Exception/xml404.jsp</location>
+  </error-page>
+  
+  <error-page>
+  	<error-code>500</error-code>
+  	<location>/jsp1202/Exception/xml500.jsp</location>
+  </error-page>
+  
+  <error-page>
+  	<exception-type>java.lang.NullPointerException</exception-type>
+  	<location>/jsp1202/Exception/nullPointer.jsp</location>
+  </error-page> -->
+  
+  
+<!--   <servlet>
+  	<servlet-name>JDBCdriver Loader</servlet-name>
+  	<servlet-class>forName.forNameLoader</servlet-class>
+  	<init-param>
+  		<param-name>jdbc</param-name>
+  		<param-value>oracle.jdbc.driver.OracleDriver</param-value>
+  	</init-param>
+  <load-on-startup>1</load-on-startup>
+  </servlet> -->
+  
+    <servlet>
+  	<servlet-name>DBCPinit</servlet-name>
+  	<servlet-class>connPool.DBCPinit</servlet-class>
+  	<init-param>
+  		<param-name>jdbcdriver</param-name>
+  		<param-value>oracle.jdbc.driver.OracleDriver</param-value>
+  	</init-param>
+  <load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  
+  
+</web-app>
