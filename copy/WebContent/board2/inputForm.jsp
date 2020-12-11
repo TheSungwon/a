@@ -7,6 +7,12 @@
 <title>회원가입</title>
 <link href="style.css" rel="stylesheet" type="text/css">
 <script language="javascript">
+/* zipcode */
+  function zipCheck(){
+	url="ZipCheck.jsp?check=y";
+	window.open(url,"post","toolbar=no ,width=500, height=300, directories=no, status=yes, scrollbars=yes, menubar=no");
+}
+/*  */
 function checkIt(){
 	var userinput=eval("document.userinput");
 	if(!userinput.id.value){
@@ -105,6 +111,17 @@ function openConfirmid(userinput){
         <input type="text" name="blog" size="60" maxlength="50">
       </td>
     </tr>
+    <!-- zipcode -->
+    <tr>
+    	<td width="200">zipcdoe</td>
+    	<td><input type="text" name="zipcode" size="7">
+    	<input type="button" value="우편번호" onclick="zipCheck()">
+    	search1</td></tr>
+    <tr> <tr>
+    <td> address</td>
+    <td><input type="text" name="address" size="70">
+    address1</td></tr>
+    <!--  -->
     <tr>
       <td colspan="2" align="center" bgcolor="<%=value_c%>">
           <input type="submit" name="confirm" value="등   록" >

@@ -4,6 +4,18 @@
 <head>
 <title>메인</title>
 <link href="style.css" rel="stylesheet" type="text/css">
+<!--  -->
+<% String cookie="";
+	Cookie[] cookies = request.getCookies(); //쿠키생성
+	if(cookies !=null && cookies.length >0)
+		for(int i=0; i<cookies.length; i++){
+			if(cookies[i].getName().equals("userId"))
+				cookie=cookies[i].getValue();
+		}
+			
+%>
+
+
 <% try{
 	if(session.getAttribute("memId")==null){%>
 <script language="javascript">
@@ -22,7 +34,7 @@ function checkIt(){
 		inputForm.passwd.focus();
 		return false;
 	}
-	}
+	
 
 </script>
 </head>
@@ -47,9 +59,11 @@ function checkIt(){
 <input type="password" name="passwd" size="15" maxlength="10" > </td>
 </tr>
 <tr>
+
 <td colspan="3" bgcolor="<%=title_c %>" align="center">
 <input type="submit" name="Submit" value="login" >
 <input type="button" value="회원가입" onclick="javascript:window.location='inputForm.jsp'">
+<input type="checkbox" name="checkbox" ><font size=1 color=orange>아이디저장</font>
 </td>
 </form>
 

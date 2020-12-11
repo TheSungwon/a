@@ -1,5 +1,10 @@
 package board;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Vector;
 public class LogonDBBean {
 
 	//ΩÃ±€≈Ê∆–≈œ
@@ -24,7 +29,7 @@ public class LogonDBBean {
 		PreparedStatement ps = null;
 		try {
 			conn=getConnection();
-			ps=conn.prepareStatement("insert into members values(?,?,?,?,?,?,?,?)");
+			ps=conn.prepareStatement("insert into members values(?,?,?,?,?,?,?,?,?,?)");
 			ps.setString(1, member.getId());
             ps.setString(2, member.getPasswd());
             ps.setString(3, member.getName());
@@ -33,7 +38,8 @@ public class LogonDBBean {
             ps.setString(6, member.getEmail());
             ps.setString(7, member.getBlog());
             ps.setTimestamp(8, member.getReg_date());
-            
+            ps.setString(9, member.getZipcode());
+            ps.setString(10, member.getAddress());
             ps.executeUpdate();
             
 		}catch(Exception e) {
@@ -179,5 +185,36 @@ public class LogonDBBean {
 			if(rs !=null)try {rs.close();} catch(SQLException e) {}
 		}
 		return x;
+	}
+	
+//	zipcode
+	public Vector zipcodeRead(String area3) {
+		Connection conn=null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Vector vec = new Vector();
+		
+		try {
+			conn = getConnection();
+			String a = "select * from zipcode where area3 like '"+area3+"%'";
+			ps = conn.prepareStatement(a);
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				ZipcodeBean tempZ = new ZipcodeBean();
+				tempZ.setZipcode(rs.getString("zipcode"));
+				tempZ.setArea1(rs.getString("area1"));
+				tempZ.setArea2(rs.getString("area2"));
+				tempZ.setArea3(rs.getString("area3"));
+				tempZ.setArea4(rs.getString("area4"));
+				vec.addElement(tempZ);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(ps !=null)try {ps.close();} catch(SQLException e) {}
+			if(conn !=null)try {conn.close();} catch(SQLException e) {}
+			if(rs !=null)try {rs.close();} catch(SQLException e) {}
+		}
+		return vec;
 	}
 }

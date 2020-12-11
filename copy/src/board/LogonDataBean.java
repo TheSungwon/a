@@ -1,5 +1,5 @@
 package board;
-import java.sql.Timestamp; //db관련할때는 sql timestamp import하기
+import java.sql.Timestamp; //db관련은 sql timestamp import하기
 
 public class LogonDataBean{
 
@@ -12,6 +12,21 @@ private String email;
 private String blog;
 private Timestamp reg_date;
 
+private String zipcode;
+private String address;
+
+public String getZipcode() {
+	return zipcode;
+}
+public void setZipcode(String zipcode) {
+	this.zipcode = zipcode;
+}
+public String getAddress() {
+	return address;
+}
+public void setAddress(String address) {
+	this.address = address;
+}
 public void setId (String id){
 this.id = id;
 }

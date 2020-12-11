@@ -7,7 +7,16 @@
 <head>
 <title> login</title>
 <link href="style.css" rel="stylesheet" type="text/css">
-
+<!--  -->
+<% String cookie="";
+	Cookie[] cookies = request.getCookies(); //쿠키생성
+	if(cookies !=null && cookies.length >0)
+		for(int i=0; i<cookies.length; i++){
+			if(cookies[i].getName().equals("userId"))
+				cookie=cookies[i].getValue();
+		}
+			
+%>
 <script language = "javascript">
 function begin(){
 	document.myform.id.focus();
@@ -47,7 +56,7 @@ function checkIt(){
 <tr height ="30">
 <td width="110" bgcolor="<%=title_c%>" align=center> 아이디저장 </td>
 <td width="150" bgcolor="<%=value_c%>" align=center>
-<input type="checkbox" name="" ></td></tr>
+<input type="checkbox" name="checkbox" ></td></tr>
 
 
 <tr height="30">
