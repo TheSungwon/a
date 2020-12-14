@@ -31,7 +31,7 @@ try{ //답변글 이라면
 <table width="400" border="1" cellspacing="0" cellpadding="0" bgcolor="<%=bodyback_c %>" align="center">
 <tr>
 	 <td align="right" colspan="2" bgcolor="<%=value_c %>">
-	 <a href="list.jsp"> Posting</a> </td></tr>
+	 <a href="list.jsp"> ㅣㅣㅣ게시ㅣㅣㅣㅣ</a> </td></tr>
 <tr>
 	 <td width="70" bgcolor="<%=value_c %>" align="center">name</td>
 	 <td width="330">
@@ -41,7 +41,7 @@ try{ //답변글 이라면
 	<td width="330"> <%if(request.getParameter("num")==null){ %>
 	<input type="text" size="40" maxlength="50" name="subject"></td>
 	<%}else{ %>
-	<input type="text" size="40" maxlength="50" name="subject" value="reply"></tr><
+	<input type="text" size="40" maxlength="50" name="subject" value="@reply@"></tr>
 <%} %>
 <tr>
 	<td width="70" bgcolor="<%=value_c %>" align="center"> email</td>

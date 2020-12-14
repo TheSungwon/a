@@ -10,19 +10,11 @@
 %>
 
 <%
-String search = request.getParameter("search");
 String pageNum = request.getParameter("pageNum"); //넘어온 pageNum받기
-int searchn = 0;	
-
-if(pageNum == null){
-		pageNum = "1";	//pagenum이 para~값을 못 받았다면 1페이지로
+	if(pageNum == null){
+		pageNum = "1";
 	}
 
-if(search == null){
-	search="";
-}else{
-	searchn = Integer.parseInt(request.getParameter("searchn"));
-}
 	int currentPage = Integer.parseInt(pageNum); //int값으로 받기
 	System.out.println(currentPage); //..? 콘솔창에 현재페이지출력
 	
@@ -35,16 +27,9 @@ if(search == null){
 	BoardDBBean dbPro = BoardDBBean.getInstance();
 	count = dbPro.getArticleCount(); //몇 줄인지 count에
 	
-	//
-	if(search.equals("") || search == null)
-	count = dbPro.getArticleCount(searchn,search);
-	
-	
 	if(count > 0){
-		if(search.equals("") || search == null)
-		articleList = dbPro.getArticles(startRow, endRow); //0보다 클 때 row에 넣어서 articleList로
-		else
-		articleList = dbPro.getArticles(startRow, endRow,searchn,search);	
+		articleList = dbPro.getArticle(startRow, endRow); //0보다 클 때 row에 넣어서 articleList로
+		
 	}
 	number = count - (currentPage -1) * pageSize; //11 - (2-1)*3 =8 ..? 연속된 페이지처럼 ?
 			
@@ -60,7 +45,7 @@ if(search == null){
 </head>
 
 <body bgcolor="<%=bodyback_c %>">
-<center><b>글(전체 :<%=count %>)</b><!--  //count변수출력 -->
+<center><b>글(전체 :<%=count %>)</b><!--  //count변수출력 --></center>
 <table width="700">
 <tr>
 	<td align="right" bgcolor="<%=value_c %>">
@@ -83,7 +68,7 @@ if(count == 0){
 	<td align="center" width="250"> title. </td>
 	<td align="center" width="100"> writer. </td>
 	<td align="center" width="150"> date. </td>
-	<td align="center" width="50"> Views. </td>
+	<td align="center" width="50"> Look. </td>
 	<td align="center" width="100"> IP </td>
 	</tr>
 
@@ -115,7 +100,7 @@ if (article.getRe_level() > 0){ //답변글이라면 (1이라면)
 <td align="center" width="50"><%=article.getReadcount() %></td> <!-- 조회수 -->
 <td align="center" width="100"><%=article.getIp() %></td> <!-- IP -->
 </tr> <%} %></table><%} %>
-<p>
+
 <%
 if(count > 0){ //페이징
 	//전체 페이지 수를 연산
@@ -124,42 +109,15 @@ if(count > 0){ //페이징
 	int pageBlock = 5; // 게시판페이지 12345..999...
 	int endPage = startPage + pageBlock-1; // 11+5 -1 ??
 			if(endPage > pageCount) endPage = pageCount;
-		if(startPage > 5){ //6페이지면
-		if(search.equals("") || search == null){%>
-		
+		if(startPage > 5){ //6페이지면%>
 <a href="list.jsp?pageNum=<%=startPage - 5 %>">back</a>
-<%}else{ %>
-<a href="list.jsp?pageNum=<%=startPage - 5 %>&search=<%=search%>">back</a>
-<%} %>
-
-<%} for(int i=startPage; i <= endPage; i++){ 
-if(search.equals("") || search == null){
-%>
-
-<a href="list.jsp?pageNum=<%=i %>"><%=i %></a>
-<%}else{ %>
-<a href="list.jsp?pageNum=<%=i %>&search=<%=search%>&searchn=<%=searchn %>"> <%=i %></a>
-<%}%>
-
-<%} if(endPage < pageCount){ 
-if(search.equals("") || search == null){%>
-
+<%} for(int i=startPage; i <= endPage; i++){ %>
+<a href = "list.jsp?pageNum=<%=i %>"> <%=i %></a>
+<%} if(endPage < pageCount){ %>
 <a href="list.jsp?pageNum=<%=startPage + 5 %>"> next</a>
-<%}else{ %>
-<a href="list.jsp?pageNum=<%=startPage + 5 %>&search=<%=search%>&searchn=<%=searchn%>"> next</a>
+<%} } %>
 
-<%} } }%>
 
-</p>
-<form> <!-- 	//action값이없으므로 자기자신url로전송 action="list.jsp" method="get" -->
- <select name="searchn">
- <option value="0">writer</option>
- <option value="1">title</option>
- <option value="2">content</option>
- </select>
- <input type="text" name="search" size="15" maxlength="50" />
- <input type="submit" value="search"/>
-</form>
 </center>
 </body>
 </html>

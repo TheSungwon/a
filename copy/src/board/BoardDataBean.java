@@ -2,7 +2,7 @@ package board;
 
 import java.sql.Timestamp;
 
-public class BoardDataBean { //DTO
+public class BoardDataBean { //DTO data transfer object 자바빈 데이터전송객체  프로세스 간 데이터 전달
 	private int num;
 	private String writer;
 	private String subject;
