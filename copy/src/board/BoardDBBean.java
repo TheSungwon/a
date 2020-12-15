@@ -26,13 +26,15 @@ public class BoardDBBean {    //DAO. Data Access Object DB의 data접근
 	
 	//writePro 게시판입력
 	public void insertArticle(BoardDataBean article) throws Exception{
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		Connection conn = null; //db와 연결하는 객체
+		PreparedStatement ps = null; //statement를 상속받는 인터페이스. sql구문 실행 기능 객체
+		//Connection객체의 pre~ 를 통행 생성됨							db에 쿼리문을 보낸다
+		ResultSet rs = null; //statement or pre~st~ 객체로부터 select문을 사용하여 얻어온 레코드값들을 테이블의 형태로 갖는 객체
+		//select문을 사용해 데이터를가져오면 rs객체에 저장해야한다.
 		
 		//답변 or 일반글 구분해서 입력해주는 로직
 		int num = article.getNum();
-		int ref = article.getRe_level();
+		int ref = article.getRef();
 		int re_step = article.getRe_step();
 		int re_level = article.getRe_level();
 		int number = 0;

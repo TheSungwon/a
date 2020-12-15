@@ -39,7 +39,9 @@ if(search == null){
 	if(search.equals("") || search == null)
 	count = dbPro.getArticleCount(searchn,search);
 	
-	
+	///////
+	CommentDBBean cdb = CommentDBBean.getInstance();
+	////////
 	if(count > 0){
 		if(search.equals("") || search == null)
 		articleList = dbPro.getArticles(startRow, endRow); //0보다 클 때 row에 넣어서 articleList로
@@ -60,7 +62,7 @@ if(search == null){
 </head>
 
 <body bgcolor="<%=bodyback_c %>">
-<center><b>글(전체 :<%=count %>)</b><!--  //count변수출력 -->
+<center><b>글(전체 :<%=count %>)</b><!--  //count변수출력 --> </center>
 <table width="700">
 <tr>
 	<td align="right" bgcolor="<%=value_c %>">
@@ -90,6 +92,7 @@ if(count == 0){
 <%
 for (int i=0; i<articleList.size(); i++){ //자바빈객체가 들어있는 articleList
 	BoardDataBean article = (BoardDataBean)articleList.get(i); ///자바빈객체로 뽑아내기
+	int com_count = cdb.getCommentCount(article.getNum()); //댓글개수?
 %>
 <tr height="30">
 <td align="center" width="50" > <%=number --%> </td> <!-- 1씩 감소해서출력 -->
@@ -105,8 +108,18 @@ if (article.getRe_level() > 0){ //답변글이라면 (1이라면)
 <% }else{ %>
 <img src="images/level.gif" width="<%=wid %>" height="16">
 <%} %>
+
+<!--  -->
+<%if(com_count > 0){%>
+
+
 <a href="content.jsp?num=<%=article.getNum() %>&pageNum=<%=currentPage %>">
-<%=article.getSubject() %></a>  <!-- 제목출력. a태그 글번호 pageNum을 get방식으로 넘기기 -->
+<%=article.getSubject() %>	|<%=com_count %>|</a>  <!-- 제목출력. a태그 글번호 pageNum을 get방식으로 넘기기 -->
+<%}else{ %>
+<a href="content.jsp?num=<%=article.getNum() %>&pageNum=<%=currentPage %>">
+<%=article.getSubject() %></a>
+<%} %>
+
 <%if(article.getReadcount()>=20){ %> <!-- 조회수20넘으면 hot이미지 -->
 <img src="images/hot.gif" border="0" height="16"><%} %></td>
 <td align="center" width="100">
@@ -151,6 +164,7 @@ if(search.equals("") || search == null){%>
 <%} } }%>
 
 </p>
+<!-- comment -->
 <form> <!-- 	//action값이없으므로 자기자신url로전송 action="list.jsp" method="get" -->
  <select name="searchn">
  <option value="0">writer</option>
