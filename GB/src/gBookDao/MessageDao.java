@@ -67,6 +67,9 @@ public abstract class MessageDao {
 	
 	public abstract List<Message> selectList(Connection conn, int firstRow, int endRow)throws SQLException;
 	//테이블로부터 시작행과 끝행에 해당하는 메시지목록을 읽어오는 메서드
+	////////////////////////////////////////////////////////////////////
+	
+	
 	
 	public int delete(Connection conn, int messageId)throws SQLException{
 		PreparedStatement ps = null;
@@ -83,5 +86,22 @@ public abstract class MessageDao {
 		}
 	}//테이블에서 지정한 주요키에 해당하는 데이터를 삭제하는 쿼리실행하고 삭제된행의 개수 리턴
 
+	
+	
+	
+	///////////////////////////////////수정메소드
+	public int update(Connection conn, Message message)throws SQLException{
+		PreparedStatement ps = null;
+		
+		try {
+			ps = conn.prepareStatement("update guestbook_message set message=? where message_id = ?");
+			ps.setString(1, message.getMessage());
+			ps.setInt(2, message.getId());
+			return ps.executeUpdate();
+			
+		}finally {
+			jdbcUtil.close(ps);
+		}
+	}
 }
 	

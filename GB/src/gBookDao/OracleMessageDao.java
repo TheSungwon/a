@@ -11,16 +11,14 @@ import java.util.List;
 
 import gBook.Message;
 import gBook.jdbcUtil;
-import gBookDao.MessageDao;
-import gBook.Message;
 
 public class OracleMessageDao  extends MessageDao{		//오라클 쿼리 수행
 	@Override
 	public int insert(Connection conn, Message message) throws SQLException {
 		PreparedStatement ps = null;
 		
-		try { ps = conn.prepareStatement("insert into guestbook_message (message_id, guest_name, password,message )"
-				+" values(message_id_seq.NEXTVAL,?,?,?)");
+		try { ps = conn.prepareStatement( "insert into guestbook_message "
+		+" (message_id,guest_name,password,message) "+" values(message_id_seq.NEXTVAL,?,?,?)");
 		ps.setString(1, message.getGuestName());
 		ps.setString(2, message.getPassword());
 		ps.setString(3, message.getMessage());
@@ -41,8 +39,12 @@ public class OracleMessageDao  extends MessageDao{		//오라클 쿼리 수행
 		ResultSet rs = null;
 		
 		try {
-			ps = conn.prepareStatement("select message_id,guest_name,password,message from(select rownum rnum, message_id,guest_name,password,message from "
-					+" (select * from guestbook_message m order by m.message_id desc) where rownum <= ? where rnum >= ?	");
+			ps = conn.prepareStatement("select message_id,guest_name,password,message from ( "+
+		" select rownum rnum, message_id,guest_name,password,message from ( "+
+		" select * from guestbook_message m order by m.message_id desc "+
+		" ) where rownum <= ? "+
+		" ) where rnum >= ?");
+
 			
 			ps.setInt(1, endRow);
 			ps.setInt(2, firstRow);
