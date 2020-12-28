@@ -57,7 +57,7 @@ public class ArticleDao {
 					+" ) where rnum>=? ");
 			ps.setInt(1, endRow);
 			ps.setInt(2, firstRow);
-			
+			rs=ps.executeQuery();
 			if(!rs.next()) {
 				return Collections.emptyList();
 			}
@@ -145,6 +145,116 @@ public class ArticleDao {
 			jdbcUtil.close(ps);
 			jdbcUtil.close(st);
 			
+		}
+	}
+	
+	///////////////////////////
+	/*
+	 *  해당 ID에 해당하는 게시글 DB테이블에서 읽어오고, 조회수를 증가시켜주는 기능 
+	 *  
+	 *  selectById 지정한 ID에 해당하는 데이터를 테이블에서 읽어와 Article객체를 생성한뒤 리턴
+	 *  존재하지 않으면 null리턴
+	 *  
+	 *  increaseReadCount 지정한 ID에 해다하는 데이터의 read_count칼럼 값을 1 증가시킨다*/
+	
+	public Article selectById(Connection conn, int articleId)throws SQLException{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		try {
+			ps = conn.prepareStatement("select * from article where article_id = ?");
+			ps.setInt(1, articleId);
+			rs=ps.executeQuery();
+			if(!rs.next()) {
+				return null;
+			}
+			
+			Article article = makeArticleFromResultSet(rs, true);
+			return article;	//데이터가 존재할 경우 ResultSet으로부터 Article객체를 생성한 뒤 리턴
+			
+		}finally {
+			jdbcUtil.close(rs);
+			jdbcUtil.close(ps);
+		}
+		
+	}
+	
+	
+	public void increaseReadCount (Connection conn, int articleId)throws SQLException{
+		PreparedStatement ps = null;
+		
+		try {
+			ps = conn.prepareStatement("update article set read_count = read_count + 1 where article_id = ?");
+			ps.setInt(1, articleId);
+			ps.executeUpdate();
+			
+		}finally {
+			jdbcUtil.close(ps);
+		}
+	}
+	
+	////////////////////////////////////////////////////
+	/*
+	 * selectLastSequenceNumber() 메서드는 지정한 두 값 사이에 있는 sequence_no칼럼의 값 중 최소값을 구해주는
+	 * 기능을 제공
+	 * 
+	 * ReplyArticleService클래스는 ArticleDao.selectLastSequenceNumber()메서드를 이용해서
+	 * 답변을 등록할 부모 게시글에 등록된 마지막 자식 게시글의 순서번호를 구한다.
+	 */
+	
+	public String selectLastSequenceNumber(Connection conn, String searchMaxSeqNum,String searchMinSeqNum)
+	throws SQLException{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		try {
+			ps = conn.prepareStatement("select min(sequence_no) from article where sequence_no <? and sequence_no >=?");
+			
+			ps.setString(1, searchMaxSeqNum);
+			ps.setString(2, searchMinSeqNum);
+			rs=ps.executeQuery();
+			
+			if(!rs.next()) {
+				return null;
+			}
+			return rs.getString(1);
+			
+		}finally {
+			jdbcUtil.close(rs);
+			jdbcUtil.close(ps);
+		}
+	}
+	
+	///////////////////////////////////////////
+	/*
+	 * update 수정 ArticleDao - DB데이터수정
+	 */
+	public int update(Connection conn, Article article)throws SQLException{
+		PreparedStatement ps = null;
+		try {
+			ps = conn.prepareStatement("update article set title =?, content=? where article_id=?");
+			ps.setString(1, article.getTitle());
+			ps.setString(2, article.getContent());
+			ps.setInt(3, article.getId());
+			
+			return ps.executeUpdate();
+		}finally{
+			jdbcUtil.close(ps);
+		}
+	}
+	
+	///////////////////////////////
+	//DB에서 데이터를 삭제 delete메서드
+	public void delete(Connection conn, int articleId)throws SQLException{
+		PreparedStatement ps = null;
+		
+		try {
+			ps = conn.prepareStatement("delete from article where article_id =?");
+			ps.setInt(1, articleId);
+			ps.executeUpdate();
+			
+		}finally{
+			jdbcUtil.close(ps);
 		}
 	}
 	
