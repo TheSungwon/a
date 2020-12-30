@@ -1,0 +1,53 @@
+package pds_DAO;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import pds_DTO.PdsItem;
+
+
+public class PdsItemListModel {
+	
+	private List<PdsItem> pdsItemList;
+	private int requestPage;
+	private int totalPageCount;
+	private int startRow;
+	private int endRow;
+	
+	public PdsItemListModel() {
+		this(new ArrayList<PdsItem>(),0,0,0,0);
+	}
+	
+	public PdsItemListModel(List<PdsItem> PdsItemList, int requestPageNumber, int totalPageCount, int startRow, int endRow) {
+		this.pdsItemList = PdsItemList;
+		this.requestPage = requestPageNumber;
+		this.totalPageCount = totalPageCount;
+		this.startRow = startRow;
+		this.endRow = endRow;
+	}
+	
+	public boolean isHasPdsItem() {
+		return !pdsItemList.isEmpty();
+	}
+	
+
+	public List<PdsItem> getPdsItemList() {
+		return pdsItemList;
+	}
+
+	public int getRequestPage() {
+		return requestPage;
+	}
+
+	public int getTotalPageCount() {
+		return totalPageCount;
+	}
+
+	public int getStartRow() {
+		return startRow;
+	}
+
+	public int getEndRow() {
+		return endRow;
+	}
+}
