@@ -1,13 +1,9 @@
 package DAO;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.sound.midi.Sequencer;
-
-import com.sun.net.httpserver.Authenticator.Result;
 
 import DTO.Theme;
 import JDBC_PROVIDER.jdbcUtil;
@@ -24,7 +20,8 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.SQLException;
 
-import sequence_board.*;
+import sequence_board.Sequencer;
+
 
 public class ThemeManager {
 	
@@ -94,7 +91,7 @@ public class ThemeManager {
 			}
 			
 			//새로운 글의 번호 구하기
-			theme.setId(sequence_board.Sequencer.nextId(conn, "theme_message"));
+			theme.setId(Sequencer.nextId(conn, "theme_message"));
 			
 			//글 삽입
 			psMessage = conn.prepareStatement("insert into theme_message values(?,?,?,?,?,?,?,?,?,?,?)");
@@ -133,7 +130,7 @@ public class ThemeManager {
 			jdbcUtil.close(rs2);
 			jdbcUtil.close(psMessage);
 			jdbcUtil.close(psContent);
-			if(conn != null) {
+			if(conn != null) 
 				try {
 					conn.setAutoCommit(false);
 					conn.close();
@@ -147,7 +144,7 @@ public class ThemeManager {
 			Connection conn = null;
 			PreparedStatement psMessage = null;
 			PreparedStatement psContent = null;
-		
+			
 			try {
 				conn = getConnection();
 				conn.setAutoCommit(false);
@@ -162,16 +159,307 @@ public class ThemeManager {
 				psMessage.setInt(5, theme.getId());
 				psMessage.executeUpdate();
 				
-				conn.commit();
+				psContent.setCharacterStream(1, new StringReader(theme.getContent()),theme.getContent().length());
+				psContent.setInt(2, theme.getId());
+				psContent.executeUpdate();
 				
+				conn.commit();
 				
 			}catch(SQLException e) {
 				e.printStackTrace();
 				try {
 					conn.rollback();
-					
 				}catch(SQLException e1) {}
 				throw new Exception("update",e);
+			}finally {
+				jdbcUtil.close(psMessage);
+				jdbcUtil.close(psContent);
+				if(conn !=null)
+					try {
+						conn.setAutoCommit(true);
+						conn.close();
+					}catch(SQLException e) {}
+			}
+		}
+			
+	
+		
+//////////
+		//등록된 글의 갯수
+		public int count(List whereCond, Map valueMap)throws Exception{
+			if(valueMap == null)
+				valueMap = Collections.EMPTY_MAP;
+			
+			Connection conn = null;
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			
+			try {
+				conn = getConnection();
+				StringBuffer query = new StringBuffer(200);
+				query.append("select count(*) from theme_message ");
+				 
+				if(whereCond != null && whereCond.size() >0) {
+					query.append("where ");
+					
+					for(int i=0; i<whereCond.size(); i++) {
+						query.append(whereCond.get(i));
+						
+						if(i<whereCond.size() -1) {
+							query.append(" or "); //	//select count(*) from THEME_MESSAGE where name=? or subject=?
+							
+						}
+					}
+				}
+				ps = conn.prepareStatement(query.toString());
+				
+				
+				Iterator keyIter = valueMap.keySet().iterator();
+				
+				while(keyIter.hasNext()) {
+					Integer key = (Integer)keyIter.next();
+					Object obj = valueMap.get(key);
+					
+					if(obj instanceof String) {
+						ps.setString(key.intValue(), (String)obj);
+					}else if(obj instanceof Integer) {
+						ps.setInt(key.intValue(), ((Integer)obj).intValue());
+						
+					}else if (obj instanceof Timestamp) {
+						ps.setTimestamp(key.intValue(), (Timestamp)obj);
+					}
+				
+				}
+				rs = ps.executeQuery();
+				int count = 0;
+				if(rs.next()) {
+					count = rs.getInt(1);
+				}
+				return count;
+						
+			}catch(SQLException e) {
+				e.printStackTrace();
+				throw new Exception("count", e);
+			}finally {
+				jdbcUtil.close(rs);
+				jdbcUtil.close(ps);
+				jdbcUtil.close(conn);
+			}
+		}
+		
+		
+		
+		
+		//
+		//목록을 읽어온다
+		public List selectList(List whereCond, Map valueMap, int startRow, int endRow)throws Exception{
+			if(valueMap == null)
+				valueMap = Collections.EMPTY_MAP;
+			
+			Connection conn = null;
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			
+			try {
+				StringBuffer query = new StringBuffer(200);
+				
+				query.append("select * from ( ");
+				query.append(" select theme_message_id, group_id, order_no, levels, parent_id, register, name, email, image, password, title, rownum rnum " );
+				query.append(" from( " );
+				query.append(" select theme_message_id, group_id, order_no, levels, parent_id, register, name, email, image, password, title " );
+				query.append(" from theme_message ");
+				
+				if(whereCond != null && whereCond.size() >0) {
+					query.append(" where ");
+					
+					for(int i =0; i<whereCond.size(); i++) {
+						query.append(whereCond.get(i));
+						if(i <whereCond.size() -1) {
+							query.append(" or ");
+						}
+					}
+				}
+				
+				query.append(" order by group_id desc, order_no asc ");
+				query.append(" ) where rownum <=? ");
+				query.append(" ) where rnum >=? ");
+				
+				conn=getConnection();
+				
+				ps = conn.prepareStatement(query.toString());
+				Iterator keyIter = valueMap.keySet().iterator();
+				while(keyIter.hasNext()) {
+					Integer key = (Integer)keyIter.next();
+					Object obj = valueMap.get(key);
+					if(obj instanceof String) {
+						ps.setString(key.intValue(), (String)obj);
+					
+					}else if(obj instanceof Integer) {
+						ps.setInt(key.intValue(), ((Integer)obj).intValue());	
+						
+					}else if (obj instanceof Timestamp) {
+						ps.setTimestamp(key.intValue(), (Timestamp)obj);
+						
+					
+					}
+				
+				}
+				
+				ps.setInt(valueMap.size()+1, endRow+1);
+				ps.setInt(valueMap.size()+2, startRow+1);
+				
+				rs = ps.executeQuery();
+				if(rs.next()) {
+					List list = new java.util.ArrayList(endRow - startRow+1);
+					
+					do {
+						Theme theme = new Theme();
+						theme.setId(rs.getInt("theme_message_id"));
+						theme.setGroupId(rs.getInt("group_id"));
+						theme.setOrderNo(rs.getInt("order_no"));
+						theme.setLevels(rs.getInt("levels"));
+						theme.setParentId(rs.getInt("parent_id"));
+						theme.setRegister(rs.getTimestamp("register"));
+						theme.setName(rs.getString("name"));
+						theme.setEmail(rs.getString("email"));
+						theme.setImage(rs.getString("image"));
+						theme.setPassword(rs.getString("password"));
+						theme.setTitle(rs.getString("title"));
+						
+						list.add(theme);
+						
+					}while(rs.next());
+					return list;
+				}else {
+					return Collections.EMPTY_LIST;
+				}
+			}catch(SQLException e) {
+				e.printStackTrace();
+				throw new Exception("selectlist", e	);
+			}finally {
+				jdbcUtil.close(rs);
+				jdbcUtil.close(ps);
+				jdbcUtil.close(conn);
+			}
+		}
+		
+		
+		
+		
+		
+		//
+		//지정한 글을 읽어온다
+		public Theme select (int id) throws Exception{
+			Connection conn = null;
+			PreparedStatement psMessage = null;
+			ResultSet rsMessage = null;
+			
+			PreparedStatement psContent = null;
+			ResultSet rsContent = null;
+			
+			try {
+				Theme theme = null;
+				
+				conn = getConnection();
+				psMessage = conn.prepareStatement("select from theme_message where theme_message_id=?");
+				
+				psMessage.setInt(1, id);
+				rsMessage = psMessage.executeQuery();
+				
+				if(rsMessage.next()) {
+					theme = new Theme();
+					theme.setId(rsMessage.getInt("theme_message_id"));
+					theme.setGroupId(rsMessage.getInt("group_id"));
+					theme.setOrderNo(rsMessage.getInt("order_no"));
+					theme.setLevels(rsMessage.getInt("levels"));
+					theme.setParentId(rsMessage.getInt("parent_id"));
+					theme.setRegister(rsMessage.getTimestamp("register"));
+					theme.setName(rsMessage.getString("name"));
+					theme.setEmail(rsMessage.getString("email"));
+					theme.setImage(rsMessage.getString("image"));
+					theme.setPassword(rsMessage.getString("password"));
+					theme.setTitle(rsMessage.getString("title"));
+					
+					psContent = conn.prepareStatement("select content from theme_content where theme_message_id = ?");
+					psContent.setInt(1, id);
+					rsContent = psContent.executeQuery();
+					
+					if(rsContent.next()) {
+						Reader reader = null;
+						try {
+							reader = rsContent.getCharacterStream("content");
+							char[] buff = new char[512];
+							int len = -1;
+							StringBuffer buffer = new StringBuffer(512);
+							while( (len=reader.read(buff)) != -1) {
+							buffer.append(buff,0,len);
+							
+							}
+							theme.setContent(buffer.toString());
+							
+						}catch(IOException e	) {
+							throw new Exception("select",e);
+						}finally {
+							if(reader != null)
+								try {
+									reader.close();
+								}catch(IOException e) {}
+						}
+					}else {
+						return null;
+					}
+					return theme;
+					
+				}else {
+					return null;
+				}
+			}catch(SQLException e) {
+				e.printStackTrace();
+				throw new Exception("select", e);
+			}finally {
+				jdbcUtil.close(rsMessage);
+				jdbcUtil.close(psMessage);
+				jdbcUtil.close(rsContent);
+				jdbcUtil.close(psContent);
+			}
+		}
+		
+		
+////////////////////
+		
+		public void delete(int id)throws Exception{
+			Connection conn = null;
+			PreparedStatement psMessage = null;
+			PreparedStatement psContent = null;
+			
+			try {
+				conn = getConnection();
+				conn.setAutoCommit(false);
+				
+				psMessage = conn.prepareStatement("delete from theme_message where theme_message_id = ?");
+				
+				psContent = conn.prepareStatement("delete from theme_content where theme_message_id = ?");
+				
+				psMessage.setInt(1, id);
+				psContent.setInt(1, id);
+				
+				int upCount1 = psMessage.executeUpdate();
+				int upCount2 = psContent.executeUpdate();
+				
+				if(upCount1 + upCount2 == 2) {
+					conn.commit();
+					
+				}else {
+					conn.rollback();
+					throw new Exception("invalid id"+id);
+				}
+
+			}catch(SQLException e) {
+				e.printStackTrace();
+				try {
+					conn.rollback();
+				}catch(SQLException e1) {}
+				throw new Exception("delete",e);
 			}finally {
 				jdbcUtil.close(psMessage);
 				jdbcUtil.close(psContent);
@@ -180,9 +468,9 @@ public class ThemeManager {
 						conn.setAutoCommit(true);
 						conn.close();
 					}catch(SQLException e) {}
+					
 			}
-			
+		}
 		
-	}
 
 }
