@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+	<definition name="hello" template="/a/layout.jsp">
+	<put-attribute name="title" value="hello world!!!"></put-attribute>
+	<put-attribute name="header" value="/a/header.jsp"></put-attribute>
+	<put-attribute name="menu" value="/a/menu.jsp"></put-attribute>
+	<put-attribute name="body" value="/a/hello_body.jsp"></put-attribute>
+	<put-attribute name="footer" value="/a/footer.jsp"></put-attribute>
+	</definition>
+	
+	
+	<definition name="helloo" template="/a/layout.jsp">
+	<put-attribute name="title" value="hello world@@@"></put-attribute>
+	<put-attribute name="header" value="/a/header2.jsp"></put-attribute>
+	<put-attribute name="menu" value="/a/menu.jsp"></put-attribute>
+	<put-attribute name="body" value="/a/hello_body.jsp"></put-attribute>
+	<put-attribute name="footer" value="/a/footer2.jsp"></put-attribute>
+	</definition>
+	
+<!-- 	<definition name="helloo" extends="hello"></definition>
+	<put-attribute name="title" value="hello world@@@"></put-attribute>
+	<put-attribute name="header" value="/a/header2.jsp"></put-attribute>
+	<put-attribute name="footer" value="/a/footer2.jsp"></put-attribute>
+	</definition>
+ -->
+ 
+ 
+ 
+ <definition name="home" template="/a/layout.jsp" preparer="tiless.MenuViewPreparer">
+ 		
+ 		<put-attribute name="title" value="hello world home"></put-attribute>
+ 		<put-attribute name="header" value="/a/header.jsp"></put-attribute>
+ 		<put-attribute name="menu" value="/a/home_menu.jsp"></put-attribute>
+ 		<put-attribute name="body" value="/a/home_body.jsp"></put-attribute>
+ 		<put-attribute name="footer" value="/a/footer.jsp"></put-attribute>
+ 
+ </definition>
+
+ 	
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+</tiles-definitions>
