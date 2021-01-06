@@ -32,7 +32,7 @@ public class ThemeManager {
 	private ThemeManager() {}
 	
 	private Connection getConnection() throws Exception{
-		return DriverManager.getConnection("jdbc:apach:commons:dbcp:/connectionPool");
+		return DriverManager.getConnection("jdbc:apache:commons:dbcp:/connectionPool");
 		
 	}
 	
@@ -149,8 +149,10 @@ public class ThemeManager {
 				conn = getConnection();
 				conn.setAutoCommit(false);
 				
-				psMessage = conn.prepareStatement("update theme_message set name=?, email=?, image=?, title=? where theme_messge_id=?");//테이블1
-				psContent = conn.prepareStatement("update theme_content set content=? where theme_message_id=?"); //테이블2
+				psMessage = conn.prepareStatement( "update THEME_MESSAGE set NAME=?,EMAIL=?,IMAGE=?,TITLE=? "+
+		                "where THEME_MESSAGE_ID=?");//테이블1
+				psContent = conn.prepareStatement("update THEME_CONTENT set CONTENT=? "+
+		                "where THEME_MESSAGE_ID=?"); //테이블2
 				
 				psMessage.setString(1, theme.getName());
 				psMessage.setString(2, theme.getEmail());
@@ -361,7 +363,8 @@ public class ThemeManager {
 				Theme theme = null;
 				
 				conn = getConnection();
-				psMessage = conn.prepareStatement("select from theme_message where theme_message_id=?");
+				psMessage = conn.prepareStatement("select * from THEME_MESSAGE "+
+		                "where THEME_MESSAGE_ID = ?");
 				
 				psMessage.setInt(1, id);
 				rsMessage = psMessage.executeQuery();
@@ -380,7 +383,8 @@ public class ThemeManager {
 					theme.setPassword(rsMessage.getString("password"));
 					theme.setTitle(rsMessage.getString("title"));
 					
-					psContent = conn.prepareStatement("select content from theme_content where theme_message_id = ?");
+					psContent = conn.prepareStatement("select CONTENT from THEME_CONTENT "+
+		                    "where THEME_MESSAGE_ID = ?");
 					psContent.setInt(1, id);
 					rsContent = psContent.executeQuery();
 					

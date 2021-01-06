@@ -67,7 +67,7 @@ public class FileUploadRequestWrapper  extends HttpServletRequestWrapper{
 					}
 					parameterMap.put(name, values);
 				}else {
-					fileItemMap.put(name, fileItemMap);
+					fileItemMap.put(name, fileItem);
 				}
 			}
 			addTo(); //request속성으로 설정?
