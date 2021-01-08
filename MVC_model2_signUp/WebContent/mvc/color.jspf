@@ -1,0 +1,5 @@
+<c:set var="bodyc" value="#e0ffff"/>
+<c:set var="backc" value="#ffeb94"/>
+<c:set var="titlec" value="#bfff00"/>
+<c:set var="valuec" value="#808080"/>
+<c:set var="bar" value="#f29886"/>
