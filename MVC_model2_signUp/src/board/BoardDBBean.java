@@ -30,7 +30,7 @@ public class BoardDBBean {
 		
 		//답변 or 일반글 구분해서 입력해주는 로직
 		int num = article.getNum();
-		int ref = article.getRe_level();
+		int ref = article.getRef();
 		int re_step = article.getRe_step();
 		int re_level = article.getRe_level();
 		int number = 0;
