@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+ 
+ 
+ 
+ <!--
+ User user1 = new User("bkchoi","1234");                                   
+User user2 = new User("madvirus","qwer");
+   -->
+ <bean id="user1" class="spring.di.chap2.User">
+ 	<constructor-arg value="bkchoi"/>
+ 	<constructor-arg><value>1234</value></constructor-arg>
+ </bean>
+ 
+ <bean id="user2" class="spring.di.chap2.User">
+ 	<constructor-arg value="madvirus"/>
+ 	<constructor-arg><value>qwer</value></constructor-arg>
+ </bean>
+ 
+ 
+ 
+ 
+ 
+ <!-- 
+ User user1 = new User("bkchoi","1234");                                   
+User user2 = new User("madvirus","qwer");
+List<User> users = new ArrayList<User>();
+users.add(user1);
+users.add(user2);
+UserRepository userRepository = new UserRepository();
+userRepository.setUsers(users);
+  -->
+ <bean id="userRepository" class="spring.di.chap2.UserRepository">
+ 	<property name="users">
+ 		<list>
+ 			<ref bean="user1"/>
+ 			<ref bean="user2"/>
+ 		</list>
+ 	</property>
+ </bean>
+ 
+ <!-- 
+ PasswordChangeService pwChangeSvc = new PasswordChangeService(userRepository);
+ 
+  -->
+ <bean id="pwChangeSve" class="spring.di.chap2.PasswordChangeService">
+ 	<constructor-arg><ref bean="userRepository"/></constructor-arg>
+ </bean>
+ 
+ 
+ 
+ <!-- 
+ AuthFailLogger authFailLogger = new AuthFailLogger();
+authFailLogger.setThrehold(2);
+ 
+  -->
+ <bean id="authFailLogger" class="spring.di.chap2.AuthFailLogger">
+ 	<property name="threshold" value="2"/>
+ </bean>
+ 
+ 
+ 
+ 
+ <!-- 
+ AuthenticationService authenticationService = new AuthenticationService();
+authenticationService.setFaileLogger(authFailLogger);
+authenticationService.setUserRepository(userRepository);
+  -->
+ <bean id="authenticationService" class="spring.di.chap2.AuthenticationService">
+ 	<property name="failLogger" ref="authFailLogger"/>
+ 	<property name="userRepository" ref="userRepository"/>
+ </bean>
+ 
+ 
+       
+ </beans>
+ 
